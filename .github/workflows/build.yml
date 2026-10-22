@@ -1,0 +1,31 @@
+name: Build RaspberryOS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install cross toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: Build kernel
+        run: make
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: raspberryos-kernel
+          path: |
+            build/kernel.elf
+            build/kernel_2712.img
